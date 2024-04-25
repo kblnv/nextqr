@@ -30,7 +30,7 @@ const Sidebar: React.FC = () => {
             }
           >
             <QrCode className="w-4 h-4" />
-            Scan
+            Сканировать
           </Link>
           <Link
             href="/upload"
@@ -41,7 +41,7 @@ const Sidebar: React.FC = () => {
             }
           >
             <Upload className="w-4 h-4" />
-            Upload
+            Загрузить
           </Link>
           <Link
             href="/recently"
@@ -52,7 +52,7 @@ const Sidebar: React.FC = () => {
             }
           >
             <List className="w-4 h-4" />
-            Recently
+            Недавнее
           </Link>
         </nav>
       </div>
