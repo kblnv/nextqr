@@ -45,7 +45,7 @@ const Header: React.FC = () => {
                 }
               >
                 <QrCode className="w-5 h-5" />
-                Scan
+                Сканировать
               </Link>
             </SheetClose>
             <SheetClose asChild>
@@ -58,7 +58,7 @@ const Header: React.FC = () => {
                 }
               >
                 <Upload className="w-5 h-5" />
-                Upload
+                Загрузить
               </Link>
             </SheetClose>
             <SheetClose asChild>
@@ -71,7 +71,7 @@ const Header: React.FC = () => {
                 }
               >
                 <List className="w-5 h-5" />
-                Recently
+                Недавнее
               </Link>
             </SheetClose>
           </nav>
@@ -84,4 +84,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export { Header };

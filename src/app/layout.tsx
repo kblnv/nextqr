@@ -3,8 +3,8 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/widgets/header";
-import Sidebar from "@/components/widgets/sidebar";
+import { Header } from "@/components/widgets/header";
+import { Sidebar } from "@/components/widgets/sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning>
       <head>
         <title>NextQR</title>
       </head>
