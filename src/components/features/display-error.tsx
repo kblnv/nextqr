@@ -29,8 +29,8 @@ const DisplayError: React.FC<IDisplayErrorProps> = ({
             <AlertCircle className="h-4 w-4" />
             <DialogTitle>Ошибка</DialogTitle>
           </div>
-          <DialogDescription>{decodingError.msg}</DialogDescription>
         </DialogHeader>
+        <DialogDescription>{decodingError.msg}</DialogDescription>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>
             <Button type="button" variant="secondary">
