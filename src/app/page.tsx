@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   readBarcodesFromImageData,
   type ReaderOptions,
 } from "zxing-wasm/reader";
 
 import { Button } from "@/components/shared/button";
-import { IDecodedData } from "@/types/decoded-data";
+import { DecodingResult } from "@/types/decoding-result";
 import { textIsUrl } from "@/lib/utils";
-import { DisplayDecodedData } from "@/components/features/display-decoded-data";
-import { DisplayError } from "@/components/features/display-error";
+import { DisplayResult } from "@/components/features/display-result";
 
 const readerOptions: ReaderOptions = {
   tryHarder: true,
@@ -19,10 +18,15 @@ const readerOptions: ReaderOptions = {
 
 const ScanPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [decodedData, setDecodedData] = useState<IDecodedData | null>(null);
-  const [errorOccured, setErrorOcurred] = useState(false);
+  const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
+    null
+  );
 
   let stream: MediaStream | null = null;
+
+  const resetResult = useCallback(() => {
+    setDecodingResult(null);
+  }, []);
 
   const startCamera = () => {
     navigator.mediaDevices
@@ -33,9 +37,7 @@ const ScanPage: React.FC = () => {
           stream = newStream;
         }
       })
-      .catch(() => {
-        setErrorOcurred(true);
-      });
+      .catch(() => {});
   };
 
   const stopCamera = () => {
@@ -73,9 +75,11 @@ const ScanPage: React.FC = () => {
     );
 
     if (processedData) {
-      setDecodedData({
-        text: processedData.text,
-        isURL: textIsUrl(processedData.text),
+      setDecodingResult({
+        data: {
+          text: processedData.text,
+          isURL: textIsUrl(processedData.text),
+        },
       });
     }
   };
@@ -90,11 +94,12 @@ const ScanPage: React.FC = () => {
 
       <video ref={videoRef} autoPlay className="mt-4" />
 
-      {errorOccured && (
-        <DisplayError msg="Произошла ошибка при попытке запуска камеры" />
+      {decodingResult && (
+        <DisplayResult
+          decodingResult={decodingResult}
+          resetResult={resetResult}
+        />
       )}
-
-      {decodedData && <DisplayDecodedData decodedData={decodedData} />}
     </div>
   );
 };
