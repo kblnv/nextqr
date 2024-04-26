@@ -40,7 +40,11 @@ const DisplayDecodedData: React.FC<IDisplayDecodedDataProps> = ({
 
   return (
     <Dialog defaultOpen={true}>
-      <DialogContent className="sm:max-w-md" onCloseAutoFocus={resetResult}>
+      <DialogContent
+        className="sm:max-w-md"
+        onCloseAutoFocus={resetResult}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Декодированные данные</DialogTitle>
           <DialogDescription>
@@ -66,16 +70,18 @@ const DisplayDecodedData: React.FC<IDisplayDecodedDataProps> = ({
           </Button>
         </div>
         <DialogFooter className="sm:justify-start">
-          {decodedData.isURL && (
-            <Button type="button" onClick={openLink}>
-              Открыть
-            </Button>
-          )}
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Закрыть
-            </Button>
-          </DialogClose>
+          <div className="flex sm:flex-row flex-col gap-2">
+            {decodedData.isURL && (
+              <Button type="button" onClick={openLink}>
+                Открыть
+              </Button>
+            )}
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Закрыть
+              </Button>
+            </DialogClose>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

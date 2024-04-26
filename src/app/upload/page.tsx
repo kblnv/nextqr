@@ -75,8 +75,8 @@ const UploadPage: React.FC = () => {
     <div
       className={
         dragged
-          ? "flex flex-1 items-center justify-center rounded-lg border border-blue-500 border-dashed shadow-sm"
-          : "flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
+          ? "flex flex-1 items-center justify-center rounded-lg border border-blue-500 border-dashed shadow-sm px-4"
+          : "flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm px-4"
       }
       x-chunk="dashboard-02-chunk-1"
       onDragOver={handleDragOn}
