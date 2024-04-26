@@ -9,8 +9,8 @@ import {
   SheetTrigger,
   SheetContent,
   SheetClose,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+} from "@/components/shared/sheet";
+import { Button } from "@/components/shared/button";
 import ThemeToggle from "@/components/theme-toggle";
 
 const Header: React.FC = () => {

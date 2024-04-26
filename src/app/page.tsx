@@ -1,33 +1,40 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
 import {
   readBarcodesFromImageData,
   type ReaderOptions,
 } from "zxing-wasm/reader";
 
+import { Button } from "@/components/shared/button";
+import { IDecodedData } from "@/types/decoded-data";
+import { textIsUrl } from "@/lib/utils";
+import { DisplayDecodedData } from "@/components/features/display-decoded-data";
+import { DisplayError } from "@/components/features/display-error";
+
 const readerOptions: ReaderOptions = {
   tryHarder: true,
+  formats: ["QRCode"],
 };
 
 const ScanPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [decodedText, setDecodedText] = useState("");
+  const [decodedData, setDecodedData] = useState<IDecodedData | null>(null);
+  const [errorOccured, setErrorOcurred] = useState(false);
 
   let stream: MediaStream | null = null;
 
   const startCamera = () => {
     navigator.mediaDevices
-      .getUserMedia({ video: true })
+      .getUserMedia({ video: { facingMode: "environment" } })
       .then((newStream) => {
         if (videoRef.current) {
           videoRef.current.srcObject = newStream;
           stream = newStream;
         }
       })
-      .catch((error) => {
-        console.error("Error accessing camera:", error);
+      .catch(() => {
+        setErrorOcurred(true);
       });
   };
 
@@ -46,6 +53,7 @@ const ScanPage: React.FC = () => {
       videoRef.current!.videoWidth,
       videoRef.current!.videoHeight
     ).getContext("2d") as OffscreenCanvasRenderingContext2D;
+
     context.drawImage(
       videoRef.current!,
       0,
@@ -59,21 +67,21 @@ const ScanPage: React.FC = () => {
       videoRef.current!.videoWidth,
       videoRef.current!.videoHeight
     );
-    const decodedData = await readBarcodesFromImageData(
+    const [processedData] = await readBarcodesFromImageData(
       imageData,
       readerOptions
     );
 
-    console.log(imageData);
-    console.log(decodedData);
-
-    if (decodedData.length > 0) {
-      setDecodedText(decodedData[0].text);
+    if (processedData) {
+      setDecodedData({
+        text: processedData.text,
+        isURL: textIsUrl(processedData.text),
+      });
     }
   };
 
   return (
-    <div>
+    <div className="grid w-full max-w-sm items-center gap-1.5">
       <div className="flex gap-4">
         <Button onClick={startCamera}>Включить камеру</Button>
         <Button onClick={stopCamera}>Выключить камеру</Button>
@@ -82,7 +90,11 @@ const ScanPage: React.FC = () => {
 
       <video ref={videoRef} autoPlay className="mt-4" />
 
-      {decodedText.length > 0 && <p>{decodedText}</p>}
+      {errorOccured && (
+        <DisplayError msg="Произошла ошибка при попытке запуска камеры" />
+      )}
+
+      {decodedData && <DisplayDecodedData decodedData={decodedData} />}
     </div>
   );
 };

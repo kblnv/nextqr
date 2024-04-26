@@ -1,58 +1,115 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 
 import { readBarcodesFromImageFile } from "zxing-wasm";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { DisplayDecodedData } from "@/components/features/display-decoded-data";
-import { DisplayError } from "@/components/features/display-error";
-import { IDecodedData } from "@/types/decoded-data";
+import { DisplayResult } from "@/components/features/display-result";
+import { Input } from "@/components/shared/input";
+import { Label } from "@/components/shared/label";
 import { textIsUrl } from "@/lib/utils";
+import { DecodingResult } from "@/types/decoding-result";
 
 const UploadPage: React.FC = () => {
-  const [decodedData, setDecodedData] = useState<IDecodedData | null>(null);
-  const [errorOccured, setErrorOcurred] = useState(false);
+  const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
+    null
+  );
+  const [dragged, setDragged] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
-  ) => {
-    setDecodedData(null);
-    setErrorOcurred(false);
+  const resetResult = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.value = "";
+      setDecodingResult(null);
+    }
+  }, []);
 
-    const fileList = event.target.files;
+  const uploadAndProcessFile = async (fileList: FileList | null) => {
+    setDecodingResult(null);
 
     try {
       if (fileList) {
         const [file] = fileList;
         const [processedFile] = await readBarcodesFromImageFile(file);
 
-        setDecodedData({
-          text: processedFile.text,
-          isURL: textIsUrl(processedFile.text),
+        setDecodingResult({
+          data: {
+            text: processedFile.text,
+            isURL: textIsUrl(processedFile.text),
+          },
         });
       }
     } catch (err) {
-      setErrorOcurred(true);
+      setDecodingResult({
+        error: {
+          msg: "Произошла ошибка в ходе считывания файла: неправильный тип файла или QR-код не распознан",
+        },
+      });
     }
   };
 
+  const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
+    event
+  ) => {
+    const fileList = event.target.files;
+    uploadAndProcessFile(fileList);
+  };
+
+  const handleDragOn: React.DragEventHandler = (event) => {
+    event.preventDefault();
+    setDragged(true);
+  };
+
+  const handleDragOff: React.DragEventHandler = (event) => {
+    event.preventDefault();
+    setDragged(false);
+  };
+
+  const handleDrop: React.DragEventHandler = (event) => {
+    event.preventDefault();
+    setDragged(false);
+    uploadAndProcessFile(event.dataTransfer.files);
+  };
+
   return (
-    <div className="grid w-full max-w-sm items-center gap-1.5">
-      <Label htmlFor="picture">Загрузите файл с QR-кодом</Label>
-      <Input
-        id="picture"
-        type="file"
-        onChange={handleFileUpload}
-        accept=".png, .jpg, .jpeg"
-      />
+    <div
+      className={
+        dragged
+          ? "flex flex-1 items-center justify-center rounded-lg border border-blue-500 border-dashed shadow-sm"
+          : "flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
+      }
+      x-chunk="dashboard-02-chunk-1"
+      onDragOver={handleDragOn}
+      onDragEnter={handleDragOn}
+      onDragLeave={handleDragOff}
+      onDrop={handleDrop}
+    >
+      <div className="flex flex-col items-center gap-1 text-center">
+        <h3 className="text-2xl font-bold tracking-tight">
+          Загрузите файл с QR-кодом
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Выберите файл или перетащите его в эту область
+        </p>
+        <Label htmlFor="picture" className="sr-only">
+          Выберите файл для загрузки
+        </Label>
+        <Input
+          ref={inputRef}
+          id="picture"
+          type="file"
+          onChange={handleFileUpload}
+          accept=".png, .jpg, .jpeg"
+          className="mt-4"
+        />
 
-      {errorOccured && (
-        <DisplayError msg="Произошла ошибка в ходе считывания файла" />
-      )}
-
-      {decodedData && <DisplayDecodedData decodedData={decodedData} />}
+        {decodingResult && (
+          <DisplayResult
+            decodingResult={decodingResult}
+            resetResult={resetResult}
+          />
+        )}
+      </div>
     </div>
   );
 };
