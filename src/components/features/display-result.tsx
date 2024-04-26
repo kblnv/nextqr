@@ -16,7 +16,10 @@ const DisplayResult: React.FC<IDisplayResultProps> = ({
   return (
     <>
       {decodingResult.error ? (
-        <DisplayError decodingError={decodingResult.error} />
+        <DisplayError
+          decodingError={decodingResult.error}
+          resetResult={resetResult}
+        />
       ) : (
         <DisplayDecodedData
           decodedData={decodingResult.data}
