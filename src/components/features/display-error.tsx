@@ -1,5 +1,4 @@
-import React from "react";
-import { IDecodingError } from "@/types/decoding-result";
+import { Button } from "@/components/shared/button";
 import {
   Dialog,
   DialogClose,
@@ -9,8 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/shared/dialog";
-import { Button } from "@/components/shared/button";
+import { IDecodingError } from "@/types/decoding-result";
 import { AlertCircle } from "lucide-react";
+import React from "react";
 
 interface IDisplayErrorProps {
   decodingError: IDecodingError["error"];
@@ -23,7 +23,10 @@ const DisplayError: React.FC<IDisplayErrorProps> = ({
 }) => {
   return (
     <Dialog defaultOpen={true}>
-      <DialogContent className="sm:max-w-md" onCloseAutoFocus={resetResult}>
+      <DialogContent
+        className="w-11/12 sm:max-w-md"
+        onCloseAutoFocus={resetResult}
+      >
         <DialogHeader>
           <div className="flex gap-2">
             <AlertCircle className="h-4 w-4" />

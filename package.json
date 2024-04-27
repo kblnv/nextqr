@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fmt": "npx prettier --write ./src",
+    "check": "npx prettier --check ./src"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
@@ -31,6 +33,9 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.2",
     "postcss": "^8",
+    "prettier": "^3.2.5",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

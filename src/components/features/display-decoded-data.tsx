@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 
 import { Copy } from "lucide-react";
 
+import { Button } from "@/components/shared/button";
 import {
   Dialog,
   DialogClose,
@@ -11,9 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/shared/dialog";
-import { Label } from "@/components/shared/label";
 import { Input } from "@/components/shared/input";
-import { Button } from "@/components/shared/button";
+import { Label } from "@/components/shared/label";
 import { IDecodedData } from "@/types/decoding-result";
 
 interface IDisplayDecodedDataProps {
@@ -41,7 +41,7 @@ const DisplayDecodedData: React.FC<IDisplayDecodedDataProps> = ({
   return (
     <Dialog defaultOpen={true}>
       <DialogContent
-        className="sm:max-w-md w-11/12"
+        className="w-11/12 sm:max-w-md"
         onCloseAutoFocus={resetResult}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
@@ -70,7 +70,7 @@ const DisplayDecodedData: React.FC<IDisplayDecodedDataProps> = ({
           </Button>
         </div>
         <DialogFooter className="sm:justify-start">
-          <div className="flex sm:flex-row flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             {decodedData.isURL && (
               <Button type="button" onClick={openLink}>
                 Открыть

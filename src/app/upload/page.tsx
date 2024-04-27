@@ -12,7 +12,7 @@ import { DecodingResult } from "@/types/decoding-result";
 
 const UploadPage: React.FC = () => {
   const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
-    null
+    null,
   );
   const [dragged, setDragged] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -49,7 +49,7 @@ const UploadPage: React.FC = () => {
   };
 
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
+    event,
   ) => {
     const fileList = event.target.files;
     uploadAndProcessFile(fileList);
@@ -75,8 +75,8 @@ const UploadPage: React.FC = () => {
     <div
       className={
         dragged
-          ? "flex flex-1 items-center justify-center rounded-lg border border-blue-500 border-dashed shadow-sm px-4"
-          : "flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm px-4"
+          ? "flex flex-1 items-center justify-center rounded-lg border border-dashed border-blue-500 px-4 shadow-sm"
+          : "flex flex-1 items-center justify-center rounded-lg border border-dashed px-4 shadow-sm"
       }
       x-chunk="dashboard-02-chunk-1"
       onDragOver={handleDragOn}

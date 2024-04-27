@@ -1,16 +1,17 @@
 "use client";
 
+import { DisplayCamAccess } from "@/components/features/display-cam-access";
+import { DisplayResult } from "@/components/features/display-result";
+import { Button } from "@/components/shared/button";
+import { textIsUrl } from "@/lib/utils";
+import { DecodingResult } from "@/types/decoding-result";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import { LoaderCircle } from "lucide-react";
 import {
   readBarcodesFromImageData,
   type ReaderOptions,
 } from "zxing-wasm/reader";
-import { DecodingResult } from "@/types/decoding-result";
-import { textIsUrl } from "@/lib/utils";
-import { DisplayResult } from "@/components/features/display-result";
-import { Button } from "@/components/shared/button";
-import { LoaderCircle } from "lucide-react";
-import { DisplayCamAccess } from "@/components/features/display-cam-access";
 
 const readerOptions: ReaderOptions = {
   tryHarder: true,
@@ -19,7 +20,7 @@ const readerOptions: ReaderOptions = {
 
 const ScanPage: React.FC = () => {
   const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
-    null
+    null,
   );
 
   const [hasCamAccess, setHasCamAccess] = useState(false);
@@ -71,7 +72,7 @@ const ScanPage: React.FC = () => {
   const handleCamScan = async () => {
     const context = new OffscreenCanvas(
       videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight
+      videoRef.current!.videoHeight,
     ).getContext("2d") as OffscreenCanvasRenderingContext2D;
 
     context.drawImage(
@@ -79,19 +80,19 @@ const ScanPage: React.FC = () => {
       0,
       0,
       videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight
+      videoRef.current!.videoHeight,
     );
     const imageData = context.getImageData(
       0,
       0,
       videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight
+      videoRef.current!.videoHeight,
     );
 
     try {
       const [processedData] = await readBarcodesFromImageData(
         imageData,
-        readerOptions
+        readerOptions,
       );
       setDecodingResult({
         data: {
@@ -113,25 +114,25 @@ const ScanPage: React.FC = () => {
       <div
         className={
           camOn
-            ? "flex flex-1 justify-center rounded-lg border border-dashed shadow-sm p-4"
-            : "flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm p-4"
+            ? "flex flex-1 justify-center rounded-lg border border-dashed p-4 shadow-sm"
+            : "flex flex-1 items-center justify-center rounded-lg border border-dashed p-4 shadow-sm"
         }
       >
         <div className={camOn ? "hidden" : "block"}>
           {checkingCamAccess ? (
-            <LoaderCircle className="w-8 h-8 text-blue-500 animate-spin" />
+            <LoaderCircle className="h-8 w-8 animate-spin text-blue-500" />
           ) : (
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <DisplayCamAccess hasAccess={hasCamAccess} />
             </div>
           )}
         </div>
         <video
           ref={videoRef}
-          className={camOn ? "block rounded-lg h-full" : "hidden"}
+          className={camOn ? "block h-full rounded-lg" : "hidden"}
         />
       </div>
-      <div className="flex gap-2 flex-col sm:flex-row">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Button
           variant="outline"
           onClick={handleCamOn}
