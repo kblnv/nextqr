@@ -10,6 +10,7 @@ import { Button } from "@/components/shared/button";
 import { DecodingResult } from "@/types/decoding-result";
 import { textIsUrl } from "@/lib/utils";
 import { DisplayResult } from "@/components/features/display-result";
+import { Check, X } from "lucide-react";
 
 const readerOptions: ReaderOptions = {
   tryHarder: true,
@@ -21,6 +22,7 @@ const ScanPage: React.FC = () => {
   const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
     null
   );
+  const [hasCamAccess, setHasCamAccess] = useState(false);
 
   let stream: MediaStream | null = null;
 
@@ -85,22 +87,41 @@ const ScanPage: React.FC = () => {
   };
 
   return (
-    <div className="grid w-full max-w-sm items-center gap-1.5">
-      <div className="flex gap-4">
-        <Button onClick={startCamera}>Включить камеру</Button>
-        <Button onClick={stopCamera}>Выключить камеру</Button>
-        <Button onClick={scan}>Сканировать</Button>
+    <>
+      <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm px-4">
+        <div className="flex gap-2 items-center">
+          {hasCamAccess ? (
+            <>
+              <X className="w-5 h-5 text-red-500" />
+              <p className="text-md font-semibold sm:text-lg">
+                Вы не предоставили доступ к камере
+              </p>
+            </>
+          ) : (
+            <>
+              <Check className="w-5 h-5 text-green-500" />
+              <p className="text-md font-semibold sm:text-lg">
+                Вы предоставили доступ к камере
+              </p>
+            </>
+          )}
+        </div>
       </div>
-
-      <video ref={videoRef} autoPlay className="mt-4" />
-
-      {decodingResult && (
-        <DisplayResult
-          decodingResult={decodingResult}
-          resetResult={resetResult}
-        />
-      )}
-    </div>
+      <div className="flex gap-2 flex-col sm:flex-row">
+        <Button onClick={startCamera} variant="outline">
+          Включить камеру
+        </Button>
+        <Button onClick={scan} variant="outline">
+          Сканировать
+        </Button>
+        <Button
+          onClick={() => setHasCamAccess(!hasCamAccess)}
+          variant="outline"
+        >
+          Доступ
+        </Button>
+      </div>
+    </>
   );
 };
 
