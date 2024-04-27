@@ -7,6 +7,7 @@ import { readBarcodesFromImageFile } from "zxing-wasm";
 import { DisplayResult } from "@/components/features/display-result";
 import { Input } from "@/components/shared/input";
 import { Label } from "@/components/shared/label";
+import { Loader } from "@/components/shared/loader";
 import { textIsUrl } from "@/lib/utils";
 import { DecodingResult } from "@/types/decoding-result";
 
@@ -15,6 +16,7 @@ const UploadPage: React.FC = () => {
     null,
   );
   const [dragged, setDragged] = useState(false);
+  const [fileProcessing, setFileProcessing] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const resetResult = useCallback(() => {
@@ -26,6 +28,7 @@ const UploadPage: React.FC = () => {
 
   const uploadAndProcessFile = async (fileList: FileList | null) => {
     setDecodingResult(null);
+    setFileProcessing(true);
 
     try {
       if (fileList) {
@@ -46,6 +49,8 @@ const UploadPage: React.FC = () => {
         },
       });
     }
+
+    setFileProcessing(false);
   };
 
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
@@ -85,31 +90,37 @@ const UploadPage: React.FC = () => {
       onDrop={handleDrop}
     >
       <div className="flex flex-col items-center gap-1 text-center">
-        <h3 className="text-2xl font-bold tracking-tight">
-          Загрузите файл с QR-кодом
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Выберите файл или перетащите его в эту область
-        </p>
-        <Label htmlFor="picture" className="sr-only">
-          Выберите файл для загрузки
-        </Label>
-        <Input
-          ref={inputRef}
-          id="picture"
-          type="file"
-          onChange={handleFileUpload}
-          accept=".png, .jpg, .jpeg"
-          className="mt-4"
-        />
-
-        {decodingResult && (
-          <DisplayResult
-            decodingResult={decodingResult}
-            resetResult={resetResult}
-          />
+        {fileProcessing ? (
+          <Loader />
+        ) : (
+          <>
+            <h3 className="text-2xl font-bold tracking-tight">
+              Загрузите файл с QR-кодом
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Выберите файл или перетащите его в эту область
+            </p>
+            <Label htmlFor="picture" className="sr-only">
+              Выберите файл для загрузки
+            </Label>
+            <Input
+              ref={inputRef}
+              id="picture"
+              type="file"
+              onChange={handleFileUpload}
+              accept=".png, .jpg, .jpeg"
+              className="mt-4"
+            />
+          </>
         )}
       </div>
+
+      {decodingResult && (
+        <DisplayResult
+          decodingResult={decodingResult}
+          resetResult={resetResult}
+        />
+      )}
     </div>
   );
 };
