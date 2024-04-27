@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   readBarcodesFromImageData,
   type ReaderOptions,
 } from "zxing-wasm/reader";
-
-import { Button } from "@/components/shared/button";
 import { DecodingResult } from "@/types/decoding-result";
 import { textIsUrl } from "@/lib/utils";
 import { DisplayResult } from "@/components/features/display-result";
+import { Button } from "@/components/shared/button";
+import { LoaderCircle } from "lucide-react";
+import { DisplayCamAccess } from "@/components/features/display-cam-access";
 
 const readerOptions: ReaderOptions = {
   tryHarder: true,
@@ -17,40 +18,57 @@ const readerOptions: ReaderOptions = {
 };
 
 const ScanPage: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
     null
   );
 
-  let stream: MediaStream | null = null;
+  const [hasCamAccess, setHasCamAccess] = useState(false);
+  const [checkingCamAccess, setCheckingCamAccess] = useState(true);
+  const [camOn, setCamOn] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    let newStream: MediaStream | null = null;
+
+    navigator.mediaDevices
+      .getUserMedia({
+        video: { facingMode: "environment" },
+      })
+      .then((stream) => {
+        newStream = stream;
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          setHasCamAccess(true);
+        }
+      })
+      .catch(() => {
+        setHasCamAccess(false);
+      })
+      .finally(() => {
+        setCheckingCamAccess(false);
+      });
+
+    return () => {
+      if (newStream) {
+        newStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
 
   const resetResult = useCallback(() => {
     setDecodingResult(null);
   }, []);
 
-  const startCamera = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: "environment" } })
-      .then((newStream) => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = newStream;
-          stream = newStream;
-        }
-      })
-      .catch(() => {});
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-      stream = null;
+  const handleCamOn = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setCamOn(true);
     }
   };
 
-  const scan = async () => {
+  const handleCamScan = async () => {
     const context = new OffscreenCanvas(
       videoRef.current!.videoWidth,
       videoRef.current!.videoHeight
@@ -69,30 +87,62 @@ const ScanPage: React.FC = () => {
       videoRef.current!.videoWidth,
       videoRef.current!.videoHeight
     );
-    const [processedData] = await readBarcodesFromImageData(
-      imageData,
-      readerOptions
-    );
 
-    if (processedData) {
+    try {
+      const [processedData] = await readBarcodesFromImageData(
+        imageData,
+        readerOptions
+      );
       setDecodingResult({
         data: {
           text: processedData.text,
           isURL: textIsUrl(processedData.text),
         },
       });
+    } catch (err) {
+      setDecodingResult({
+        error: {
+          msg: "Произошла ошибка в ходе считывания данных: QR-код не распознан",
+        },
+      });
     }
   };
 
   return (
-    <div className="grid w-full max-w-sm items-center gap-1.5">
-      <div className="flex gap-4">
-        <Button onClick={startCamera}>Включить камеру</Button>
-        <Button onClick={stopCamera}>Выключить камеру</Button>
-        <Button onClick={scan}>Сканировать</Button>
+    <>
+      <div
+        className={
+          camOn
+            ? "flex flex-1 justify-center rounded-lg border border-dashed shadow-sm p-4"
+            : "flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm p-4"
+        }
+      >
+        <div className={camOn ? "hidden" : "block"}>
+          {checkingCamAccess ? (
+            <LoaderCircle className="w-8 h-8 text-blue-500 animate-spin" />
+          ) : (
+            <div className="flex gap-2 items-center">
+              <DisplayCamAccess hasAccess={hasCamAccess} />
+            </div>
+          )}
+        </div>
+        <video
+          ref={videoRef}
+          className={camOn ? "block rounded-lg h-full" : "hidden"}
+        />
       </div>
-
-      <video ref={videoRef} autoPlay className="mt-4" />
+      <div className="flex gap-2 flex-col sm:flex-row">
+        <Button
+          variant="outline"
+          onClick={handleCamOn}
+          disabled={!hasCamAccess}
+        >
+          Включить камеру
+        </Button>
+        <Button variant="outline" disabled={!camOn} onClick={handleCamScan}>
+          Сканировать
+        </Button>
+      </div>
 
       {decodingResult && (
         <DisplayResult
@@ -100,7 +150,7 @@ const ScanPage: React.FC = () => {
           resetResult={resetResult}
         />
       )}
-    </div>
+    </>
   );
 };
 

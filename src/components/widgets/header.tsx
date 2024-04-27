@@ -11,7 +11,7 @@ import {
   SheetClose,
 } from "@/components/shared/sheet";
 import { Button } from "@/components/shared/button";
-import ThemeToggle from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const Header: React.FC = () => {
   const pathname = usePathname();
@@ -22,7 +22,7 @@ const Header: React.FC = () => {
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
             <Menu className="w-5 h-5" />
-            <span className="sr-only">Toggle navigation menu</span>
+            <span className="sr-only">Открыть навигационное меню</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col">

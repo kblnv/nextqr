@@ -15,7 +15,7 @@ const UploadPage: React.FC = () => {
     null
   );
   const [dragged, setDragged] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const resetResult = useCallback(() => {
     if (inputRef.current) {
