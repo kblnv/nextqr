@@ -65,7 +65,7 @@ const DisplayDecodedData: React.FC<IDisplayDecodedDataProps> = ({
             />
           </div>
           <Button type="submit" size="sm" className="px-3" onClick={copyText}>
-            <span className="sr-only">Copy</span>
+            <span className="sr-only">Копировать</span>
             <Copy className="h-4 w-4" />
           </Button>
         </div>

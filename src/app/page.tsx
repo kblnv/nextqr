@@ -1,124 +1,77 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
-import {
-  readBarcodesFromImageData,
-  type ReaderOptions,
-} from "zxing-wasm/reader";
-
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/shared/button";
-import { DecodingResult } from "@/types/decoding-result";
-import { textIsUrl } from "@/lib/utils";
-import { DisplayResult } from "@/components/features/display-result";
-import { Check, X } from "lucide-react";
-
-const readerOptions: ReaderOptions = {
-  tryHarder: true,
-  formats: ["QRCode"],
-};
+import { LoaderCircle } from "lucide-react";
+import { DisplayCamAccess } from "@/components/features/display-cam-access";
 
 const ScanPage: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
-    null
-  );
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
   const [hasCamAccess, setHasCamAccess] = useState(false);
+  const [checkingCamAccess, setCheckingCamAccess] = useState(true);
+  const [camOn, setCamOn] = useState(false);
 
-  let stream: MediaStream | null = null;
+  useEffect(() => {
+    let newStream: MediaStream | null = null;
 
-  const resetResult = useCallback(() => {
-    setDecodingResult(null);
-  }, []);
-
-  const startCamera = () => {
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: "environment" } })
-      .then((newStream) => {
+      .getUserMedia({
+        video: { facingMode: "environment" },
+      })
+      .then((stream) => {
+        newStream = stream;
+
         if (videoRef.current) {
-          videoRef.current.srcObject = newStream;
-          stream = newStream;
+          videoRef.current.srcObject = stream;
+          setHasCamAccess(true);
         }
       })
-      .catch(() => {});
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
-      stream = null;
-    }
-  };
-
-  const scan = async () => {
-    const context = new OffscreenCanvas(
-      videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight
-    ).getContext("2d") as OffscreenCanvasRenderingContext2D;
-
-    context.drawImage(
-      videoRef.current!,
-      0,
-      0,
-      videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight
-    );
-    const imageData = context.getImageData(
-      0,
-      0,
-      videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight
-    );
-    const [processedData] = await readBarcodesFromImageData(
-      imageData,
-      readerOptions
-    );
-
-    if (processedData) {
-      setDecodingResult({
-        data: {
-          text: processedData.text,
-          isURL: textIsUrl(processedData.text),
-        },
+      .catch(() => {
+        setHasCamAccess(false);
+      })
+      .finally(() => {
+        setCheckingCamAccess(false);
       });
+
+    return () => {
+      if (newStream) {
+        newStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  const handleCamOn = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setCamOn(true);
     }
   };
 
   return (
     <>
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm px-4">
-        <div className="flex gap-2 items-center">
-          {hasCamAccess ? (
-            <>
-              <X className="w-5 h-5 text-red-500" />
-              <p className="text-md font-semibold sm:text-lg">
-                Вы не предоставили доступ к камере
-              </p>
-            </>
+        <div className={camOn ? "hidden" : "block"}>
+          {checkingCamAccess ? (
+            <LoaderCircle className="w-8 h-8 text-blue-500 animate-spin" />
           ) : (
-            <>
-              <Check className="w-5 h-5 text-green-500" />
-              <p className="text-md font-semibold sm:text-lg">
-                Вы предоставили доступ к камере
-              </p>
-            </>
+            <div className="flex gap-2 items-center">
+              <DisplayCamAccess hasAccess={hasCamAccess} />
+            </div>
           )}
         </div>
+        <video ref={videoRef} className={camOn ? "block" : "hidden"} />
       </div>
       <div className="flex gap-2 flex-col sm:flex-row">
-        <Button onClick={startCamera} variant="outline">
+        <Button
+          variant="outline"
+          onClick={handleCamOn}
+          disabled={!hasCamAccess}
+        >
           Включить камеру
         </Button>
-        <Button onClick={scan} variant="outline">
+        <Button variant="outline" disabled={!camOn}>
           Сканировать
-        </Button>
-        <Button
-          onClick={() => setHasCamAccess(!hasCamAccess)}
-          variant="outline"
-        >
-          Доступ
         </Button>
       </div>
     </>
