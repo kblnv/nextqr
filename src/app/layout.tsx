@@ -1,8 +1,8 @@
 "use client";
 
-import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/widgets/header";
 import { Sidebar } from "@/components/widgets/sidebar";
+import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 import "./globals.css";
 

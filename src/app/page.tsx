@@ -28,16 +28,16 @@ const ScanPage: React.FC = () => {
   const [camOn, setCamOn] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const animationFrame = useRef<number | null>(null);
 
   useEffect(() => {
-    let newStream: MediaStream | null = null;
-
     navigator.mediaDevices
       .getUserMedia({
         video: { facingMode: "environment" },
       })
       .then((stream) => {
-        newStream = stream;
+        streamRef.current = stream;
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -52,69 +52,80 @@ const ScanPage: React.FC = () => {
       });
 
     return () => {
-      if (newStream) {
-        newStream.getTracks().forEach((track) => track.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
-
-  const resetResult = useCallback(() => {
-    setDecodingResult(null);
   }, []);
 
   const handleCamOn = () => {
     if (videoRef.current) {
       videoRef.current.play();
       setCamOn(true);
+      startScanning();
     }
   };
 
-  const handleCamScan = async () => {
-    const context = new OffscreenCanvas(
-      videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight,
-    ).getContext("2d") as OffscreenCanvasRenderingContext2D;
+  const handleCamOff = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setCamOn(false);
+      cancelAnimationFrame(animationFrame.current!);
+    }
+  };
 
-    context.drawImage(
-      videoRef.current!,
-      0,
-      0,
-      videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight,
-    );
-    const imageData = context.getImageData(
-      0,
-      0,
-      videoRef.current!.videoWidth,
-      videoRef.current!.videoHeight,
-    );
+  const startScanning = useCallback(async () => {
+    if (videoRef.current) {
+      const context = new OffscreenCanvas(
+        videoRef.current.videoWidth,
+        videoRef.current.videoHeight,
+      ).getContext("2d") as OffscreenCanvasRenderingContext2D;
 
-    try {
+      context.drawImage(
+        videoRef.current,
+        0,
+        0,
+        videoRef.current.videoWidth,
+        videoRef.current.videoHeight,
+      );
+      const imageData = context.getImageData(
+        0,
+        0,
+        videoRef.current.videoWidth,
+        videoRef.current.videoHeight,
+      );
+
       const [processedData] = await readBarcodesFromImageData(
         imageData,
         readerOptions,
       );
-      setDecodingResult({
-        data: {
-          text: processedData.text,
-          isURL: textIsUrl(processedData.text),
-        },
-      });
-    } catch (err) {
-      setDecodingResult({
-        error: {
-          msg: "Произошла ошибка в ходе считывания данных: QR-код не распознан",
-        },
-      });
+
+      if (!processedData) {
+        console.log("scanning!");
+        animationFrame.current = requestAnimationFrame(startScanning);
+      } else {
+        console.log("finished!");
+        setDecodingResult({
+          data: {
+            text: processedData.text,
+            isURL: textIsUrl(processedData.text),
+          },
+        });
+      }
     }
-  };
+  }, []);
+
+  const resetResult = useCallback(() => {
+    setDecodingResult(null);
+    startScanning();
+  }, [startScanning]);
 
   return (
     <>
       <div
         className={
           camOn
-            ? "flex flex-1 justify-center rounded-lg border border-dashed p-4 shadow-sm"
+            ? "flex flex-1 justify-center rounded-lg border border-dashed shadow-sm"
             : "flex flex-1 items-center justify-center rounded-lg border border-dashed p-4 shadow-sm"
         }
       >
@@ -132,18 +143,25 @@ const ScanPage: React.FC = () => {
           className={camOn ? "block h-full rounded-lg" : "hidden"}
         />
       </div>
-      <div className="flex flex-col gap-2 sm:flex-row">
+
+      {camOn ? (
         <Button
+          className="w-full sm:w-fit"
+          variant="outline"
+          onClick={handleCamOff}
+        >
+          Выключить камеру
+        </Button>
+      ) : (
+        <Button
+          className="w-full sm:w-fit"
           variant="outline"
           onClick={handleCamOn}
           disabled={!hasCamAccess}
         >
           Включить камеру
         </Button>
-        <Button variant="outline" disabled={!camOn} onClick={handleCamScan}>
-          Сканировать
-        </Button>
-      </div>
+      )}
 
       {decodingResult && (
         <DisplayResult

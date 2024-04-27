@@ -1,5 +1,4 @@
-"use client";
-
+import { ThemeToggle } from "@/components/features/theme-toggle";
 import { Button } from "@/components/shared/button";
 import {
   Sheet,
@@ -7,7 +6,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/shared/sheet";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Menu, QrCode, Upload } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
