@@ -3,7 +3,7 @@ export interface IDecodedData {
   data: {
     text: string;
     isURL: boolean;
-  }
+  };
 }
 
 export interface IDecodingError {
@@ -11,7 +11,7 @@ export interface IDecodingError {
   error: {
     msg: string;
     type?: "fromFile" | "fromCamera";
-  }
+  };
 }
 
 export type DecodingResult = IDecodedData | IDecodingError;

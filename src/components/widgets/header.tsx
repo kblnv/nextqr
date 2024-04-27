@@ -1,17 +1,17 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, QrCode, Upload, List } from "lucide-react";
+import { Button } from "@/components/shared/button";
 import {
   Sheet,
-  SheetTrigger,
-  SheetContent,
   SheetClose,
+  SheetContent,
+  SheetTrigger,
 } from "@/components/shared/sheet";
-import { Button } from "@/components/shared/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Menu, QrCode, Upload } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
 
 const Header: React.FC = () => {
   const pathname = usePathname();
@@ -21,7 +21,7 @@ const Header: React.FC = () => {
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-            <Menu className="w-5 h-5" />
+            <Menu className="h-5 w-5" />
             <span className="sr-only">Открыть навигационное меню</span>
           </Button>
         </SheetTrigger>
@@ -44,7 +44,7 @@ const Header: React.FC = () => {
                     : "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                 }
               >
-                <QrCode className="w-5 h-5" />
+                <QrCode className="h-5 w-5" />
                 Сканировать
               </Link>
             </SheetClose>
@@ -57,21 +57,8 @@ const Header: React.FC = () => {
                     : "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                 }
               >
-                <Upload className="w-5 h-5" />
+                <Upload className="h-5 w-5" />
                 Загрузить
-              </Link>
-            </SheetClose>
-            <SheetClose asChild>
-              <Link
-                href="/recently"
-                className={
-                  pathname === "/recently"
-                    ? "mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
-                    : "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                }
-              >
-                <List className="w-5 h-5" />
-                Недавнее
               </Link>
             </SheetClose>
           </nav>

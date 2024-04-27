@@ -1,8 +1,8 @@
 import React from "react";
 
+import { DecodingResult } from "@/types/decoding-result";
 import { DisplayDecodedData } from "./display-decoded-data";
 import { DisplayError } from "./display-error";
-import { DecodingResult } from "@/types/decoding-result";
 
 interface IDisplayResultProps {
   decodingResult: DecodingResult;
