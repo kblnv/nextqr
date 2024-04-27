@@ -41,7 +41,7 @@ const DisplayDecodedData: React.FC<IDisplayDecodedDataProps> = ({
   return (
     <Dialog defaultOpen={true}>
       <DialogContent
-        className="sm:max-w-md"
+        className="sm:max-w-md w-11/12"
         onCloseAutoFocus={resetResult}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
