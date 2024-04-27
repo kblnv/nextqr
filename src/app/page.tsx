@@ -7,7 +7,7 @@ import { textIsUrl } from "@/lib/utils";
 import { DecodingResult } from "@/types/decoding-result";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { LoaderCircle } from "lucide-react";
+import { Loader } from "@/components/shared/loader";
 import {
   readBarcodesFromImageData,
   type ReaderOptions,
@@ -131,7 +131,7 @@ const ScanPage: React.FC = () => {
       >
         <div className={camOn ? "hidden" : "block"}>
           {checkingCamAccess ? (
-            <LoaderCircle className="h-8 w-8 animate-spin text-blue-500" />
+            <Loader />
           ) : (
             <div className="flex items-center gap-2">
               <DisplayCamAccess hasAccess={hasCamAccess} />
