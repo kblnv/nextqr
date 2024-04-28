@@ -39,7 +39,7 @@ const DisplayDecodedData: React.FC<DisplayDecodedDataProps> = ({
       <DialogHeader>
         <DialogTitle>Декодированные данные</DialogTitle>
         <DialogDescription>
-          Все Ваши сканирования сохраняются в истории
+          Закройте окно для повторного сканирования
         </DialogDescription>
       </DialogHeader>
       <div className="flex items-center space-x-2">

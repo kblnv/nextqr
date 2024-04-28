@@ -64,6 +64,22 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  #video-container {
+    z-index: 20;
+  }
+
+  #video-container * {
+    z-index: inherit;
+  }
+
+  #modals-container {
+    z-index: 30;
+  }
+
+  #modals-container * {
+    z-index: inherit;
+  }
 }
 
 @layer base {
