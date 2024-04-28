@@ -89,15 +89,15 @@ const UploadPage: React.FC = () => {
       onDragLeave={handleDragOff}
       onDrop={handleDrop}
     >
-      <div className="flex flex-col items-center gap-1 text-center">
+      <div className="flex flex-col items-center gap-1">
         {fileProcessing ? (
           <Loader />
         ) : (
           <>
-            <h3 className="text-2xl font-bold tracking-tight">
+            <h3 className="text-center text-lg font-bold tracking-tight sm:text-2xl">
               Загрузите файл с QR-кодом
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-center text-sm text-muted-foreground">
               Выберите файл или перетащите его в эту область
             </p>
             <Label htmlFor="picture" className="sr-only">
