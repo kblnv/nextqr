@@ -17,6 +17,7 @@ const UploadPage: React.FC = () => {
   );
   const [dragged, setDragged] = useState(false);
   const [fileProcessing, setFileProcessing] = useState(false);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const resetResult = useCallback(() => {
@@ -27,8 +28,8 @@ const UploadPage: React.FC = () => {
   }, []);
 
   const uploadAndProcessFile = async (fileList: FileList | null) => {
-    setDecodingResult(null);
     setFileProcessing(true);
+    setDecodingResult(null);
 
     try {
       if (fileList) {
@@ -48,9 +49,9 @@ const UploadPage: React.FC = () => {
           msg: "Произошла ошибка в ходе считывания файла: неправильный тип файла или QR-код не распознан",
         },
       });
+    } finally {
+      setFileProcessing(false);
     }
-
-    setFileProcessing(false);
   };
 
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
@@ -83,7 +84,6 @@ const UploadPage: React.FC = () => {
           ? "flex flex-1 items-center justify-center rounded-lg border border-dashed border-blue-500 px-4 shadow-sm"
           : "flex flex-1 items-center justify-center rounded-lg border border-dashed px-4 shadow-sm"
       }
-      x-chunk="dashboard-02-chunk-1"
       onDragOver={handleDragOn}
       onDragEnter={handleDragOn}
       onDragLeave={handleDragOff}
@@ -111,16 +111,15 @@ const UploadPage: React.FC = () => {
               accept=".png, .jpg, .jpeg"
               className="mt-4"
             />
+            {decodingResult && (
+              <DisplayResult
+                decodingResult={decodingResult}
+                resetResult={resetResult}
+              />
+            )}
           </>
         )}
       </div>
-
-      {decodingResult && (
-        <DisplayResult
-          decodingResult={decodingResult}
-          resetResult={resetResult}
-        />
-      )}
     </div>
   );
 };

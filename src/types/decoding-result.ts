@@ -1,4 +1,4 @@
-export interface IDecodedData {
+export interface DecodedData {
   error?: never;
   data: {
     text: string;
@@ -6,7 +6,7 @@ export interface IDecodedData {
   };
 }
 
-export interface IDecodingError {
+export interface DecodingError {
   data?: never;
   error: {
     msg: string;
@@ -14,4 +14,4 @@ export interface IDecodingError {
   };
 }
 
-export type DecodingResult = IDecodedData | IDecodingError;
+export type DecodingResult = DecodedData | DecodingError;

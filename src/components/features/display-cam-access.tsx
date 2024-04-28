@@ -1,11 +1,11 @@
 import { Check, X } from "lucide-react";
 import React from "react";
 
-interface IDisplayCamAccessProps {
+interface DisplayCamAccessProps {
   hasAccess: boolean;
 }
 
-const DisplayCamAccess: React.FC<IDisplayCamAccessProps> = ({ hasAccess }) => {
+const DisplayCamAccess: React.FC<DisplayCamAccessProps> = ({ hasAccess }) => {
   return (
     <>
       {hasAccess ? (
