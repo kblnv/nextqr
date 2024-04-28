@@ -8,6 +8,7 @@ import { DecodingResult } from "@/types/decoding-result";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { Loader } from "@/components/shared/loader";
+import { createPortal } from "react-dom";
 import {
   readBarcodesFromImageData,
   type ReaderOptions,
@@ -27,11 +28,14 @@ const ScanPage: React.FC = () => {
   const [checkingCamAccess, setCheckingCamAccess] = useState(true);
   const [camOn, setCamOn] = useState(false);
 
+  const videoContainer = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrame = useRef<number | null>(null);
 
   useEffect(() => {
+    videoContainer.current = document.getElementById("video-container");
+
     navigator.mediaDevices
       .getUserMedia({
         video: { facingMode: "environment" },
@@ -133,15 +137,26 @@ const ScanPage: React.FC = () => {
           {checkingCamAccess ? (
             <Loader />
           ) : (
-            <div className="flex items-center gap-2">
-              <DisplayCamAccess hasAccess={hasCamAccess} />
-            </div>
+            <>
+              <div className="flex items-center gap-2">
+                <DisplayCamAccess hasAccess={hasCamAccess} />
+              </div>
+
+              {createPortal(
+                <video
+                  ref={videoRef}
+                  playsInline
+                  className={
+                    camOn
+                      ? "absolute left-0 top-0 h-full w-full object-cover"
+                      : "hidden"
+                  }
+                />,
+                videoContainer.current!,
+              )}
+            </>
           )}
         </div>
-        <video
-          ref={videoRef}
-          className={camOn ? "block h-full rounded-lg" : "hidden"}
-        />
       </div>
 
       {camOn ? (
