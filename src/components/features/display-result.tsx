@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Dialog, DialogContent } from "@/components/shared/dialog";
 import { DecodingResult } from "@/types/decoding-result";
 import { DisplayDecodedData } from "./display-decoded-data";
 import { DisplayError } from "./display-error";
@@ -14,19 +15,21 @@ const DisplayResult: React.FC<IDisplayResultProps> = ({
   resetResult,
 }) => {
   return (
-    <>
-      {decodingResult.error ? (
-        <DisplayError
-          decodingError={decodingResult.error}
-          resetResult={resetResult}
-        />
-      ) : (
-        <DisplayDecodedData
-          decodedData={decodingResult.data}
-          resetResult={resetResult}
-        />
-      )}
-    </>
+    <Dialog defaultOpen={true}>
+      <DialogContent
+        className="w-11/12 sm:max-w-md"
+        onCloseAutoFocus={resetResult}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <>
+          {decodingResult.error ? (
+            <DisplayError decodingError={decodingResult.error} />
+          ) : (
+            <DisplayDecodedData decodedData={decodingResult.data} />
+          )}
+        </>
+      </DialogContent>
+    </Dialog>
   );
 };
 
