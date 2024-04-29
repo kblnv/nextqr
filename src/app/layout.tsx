@@ -20,7 +20,6 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <div id="modals-container"></div>
-        <div id="video-container"></div>
 
         <ThemeProvider
           attribute="class"

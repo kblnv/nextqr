@@ -22,7 +22,7 @@ const DisplayCamAccess: React.FC<DisplayCamAccessProps> = ({ hasAccess }) => {
             Вы не предоставили доступ к камере
           </h1>
           <p className="text-center text-sm text-muted-foreground">
-            Чтобы продолжить предоставьте доступ к камере
+            Чтобы продолжить предоставьте доступ к камере и обновите страницу
           </p>
         </>
       )}
