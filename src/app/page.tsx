@@ -3,22 +3,14 @@
 import { DisplayCamAccess } from "@/components/features/display-cam-access";
 import { DisplayResult } from "@/components/features/display-result";
 import { Button } from "@/components/shared/button";
-import { textIsUrl } from "@/lib/utils";
 import { DecodingResult } from "@/types/decoding-result";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { Loader } from "@/components/shared/loader";
 import { ScanArea } from "@/components/shared/scan-area";
+import { textIsUrl } from "@/lib/utils";
+import { CameraService } from "@/services/camera-service";
 import { X } from "lucide-react";
-import {
-  readBarcodesFromImageData,
-  type ReaderOptions,
-} from "zxing-wasm/reader";
-
-const readerOptions: ReaderOptions = {
-  tryHarder: true,
-  formats: ["QRCode"],
-};
 
 const ScanPage: React.FC = () => {
   const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
@@ -30,21 +22,15 @@ const ScanPage: React.FC = () => {
   const [camOn, setCamOn] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const scanAreaRef = useRef<HTMLDivElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        streamRef.current = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = streamRef.current;
-          setHasCamAccess(true);
-        }
+        streamRef.current = await CameraService.requestCameraAccess();
+        videoRef.current!.srcObject = streamRef.current;
+        setHasCamAccess(true);
       } catch (err) {
         setHasCamAccess(false);
       } finally {
@@ -60,72 +46,36 @@ const ScanPage: React.FC = () => {
   }, []);
 
   const handleCamOn = async () => {
-    if (videoRef.current) {
-      await videoRef.current.play();
-      setCamOn(true);
-      startScanning();
-    }
+    await videoRef.current!.play();
+    setCamOn(true);
+    startScanning();
   };
 
   const handleCamOff = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      setCamOn(false);
-      cancelAnimationFrame(animationFrameRef.current!);
-    }
+    videoRef.current!.pause();
+    setCamOn(false);
+    cancelAnimationFrame(animationFrameRef.current!);
   };
 
   const startScanning = useCallback(async () => {
-    if (videoRef.current && scanAreaRef.current) {
-      const videoWidth = videoRef.current.videoWidth;
-      const videoHeight = videoRef.current.videoHeight;
+    const processedFrame = await CameraService.scanVideoFrame(
+      videoRef.current!,
+      310,
+      310,
+    );
 
-      const scanAreaWidth = 310;
-      const scanAreaHeight = 310;
-
-      const scanAreaLeft = (videoWidth - scanAreaWidth) / 2;
-      const scanAreaTop = (videoHeight - scanAreaHeight) / 2;
-
-      const context = new OffscreenCanvas(videoWidth, videoHeight).getContext(
-        "2d",
-      ) as OffscreenCanvasRenderingContext2D;
-
-      context.drawImage(
-        videoRef.current,
-        scanAreaLeft,
-        scanAreaTop,
-        scanAreaWidth,
-        scanAreaHeight,
-        0,
-        0,
-        scanAreaWidth,
-        scanAreaHeight,
-      );
-
-      const imageData = context.getImageData(
-        0,
-        0,
-        scanAreaWidth,
-        scanAreaHeight,
-      );
-
-      const [processedData] = await readBarcodesFromImageData(
-        imageData,
-        readerOptions,
-      );
-
-      if (!processedData) {
-        console.log("scanning!");
-        animationFrameRef.current = requestAnimationFrame(startScanning);
-      } else {
-        console.log("finished!");
-        setDecodingResult({
-          data: {
-            text: processedData.text,
-            isURL: textIsUrl(processedData.text),
-          },
-        });
-      }
+    if (!processedFrame) {
+      console.log("scanning!");
+      animationFrameRef.current = requestAnimationFrame(startScanning);
+    } else {
+      console.log("finished!");
+      cancelAnimationFrame(animationFrameRef.current!);
+      setDecodingResult({
+        data: {
+          text: processedFrame.text,
+          isURL: textIsUrl(processedFrame.text),
+        },
+      });
     }
   }, []);
 
@@ -136,7 +86,10 @@ const ScanPage: React.FC = () => {
 
   return (
     <>
-      <div id="video-container" className={camOn ? "fixed left-0 top-0 h-full w-full" : "hidden"}>
+      <div
+        id="video-container"
+        className={camOn ? "fixed left-0 top-0 h-full w-full" : "hidden"}
+      >
         <video
           ref={videoRef}
           playsInline
@@ -150,10 +103,7 @@ const ScanPage: React.FC = () => {
         >
           <X />
         </Button>
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          ref={scanAreaRef}
-        >
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <ScanArea />
         </div>
       </div>
