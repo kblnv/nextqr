@@ -136,7 +136,7 @@ const ScanPage: React.FC = () => {
 
   return (
     <>
-      <div className={camOn ? "absolute left-0 top-0 h-full w-full" : "hidden"}>
+      <div id="video-container" className={camOn ? "fixed left-0 top-0 h-screen w-screen" : "hidden"}>
         <video
           ref={videoRef}
           playsInline
