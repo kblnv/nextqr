@@ -7,18 +7,18 @@ import { DisplayError } from "./display-error";
 
 interface IDisplayResultProps {
   decodingResult: DecodingResult;
-  resetResult: () => void;
+  onModalClose: () => void;
 }
 
 const DisplayResult: React.FC<IDisplayResultProps> = ({
   decodingResult,
-  resetResult,
+  onModalClose,
 }) => {
   return (
     <Dialog defaultOpen={true}>
       <DialogContent
         className="w-11/12 sm:max-w-md"
-        onCloseAutoFocus={resetResult}
+        onCloseAutoFocus={onModalClose}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <>

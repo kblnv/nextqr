@@ -54,6 +54,7 @@ const ScanPage: React.FC = () => {
   const handleCamOff = () => {
     videoRef.current!.pause();
     setCamOn(false);
+    setDecodingResult(null);
     cancelAnimationFrame(animationFrameRef.current!);
   };
 
@@ -70,6 +71,7 @@ const ScanPage: React.FC = () => {
     } else {
       console.log("finished!");
       cancelAnimationFrame(animationFrameRef.current!);
+      setCamOn(false);
       setDecodingResult({
         data: {
           text: processedFrame.text,
@@ -81,8 +83,7 @@ const ScanPage: React.FC = () => {
 
   const resetResult = useCallback(() => {
     setDecodingResult(null);
-    startScanning();
-  }, [startScanning]);
+  }, []);
 
   return (
     <>
@@ -129,7 +130,7 @@ const ScanPage: React.FC = () => {
       {decodingResult && (
         <DisplayResult
           decodingResult={decodingResult}
-          resetResult={resetResult}
+          onModalClose={resetResult}
         />
       )}
     </>

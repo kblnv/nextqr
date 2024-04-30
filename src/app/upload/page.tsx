@@ -114,7 +114,7 @@ const UploadPage: React.FC = () => {
             {decodingResult && (
               <DisplayResult
                 decodingResult={decodingResult}
-                resetResult={resetResult}
+                onModalClose={resetResult}
               />
             )}
           </>
