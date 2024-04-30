@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Dialog, DialogContent } from "@/components/shared/dialog";
 import { DecodingResult } from "@/types/decoding-result";
 import { DisplayDecodedData } from "./display-decoded-data";

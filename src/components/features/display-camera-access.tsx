@@ -8,7 +8,7 @@ interface CameraAccessProps {
   setCamOn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CameraAccess: React.FC<CameraAccessProps> = ({
+const DisplayCameraAccess: React.FC<CameraAccessProps> = ({
   camAccessState,
   setCamOn,
 }) => {
@@ -47,4 +47,4 @@ const CameraAccess: React.FC<CameraAccessProps> = ({
   );
 };
 
-export { CameraAccess };
+export { DisplayCameraAccess };

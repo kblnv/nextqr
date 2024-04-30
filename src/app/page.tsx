@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 
+import { DisplayCameraAccess } from "@/components/features/display-camera-access";
 import { Camera } from "@/components/widgets/camera";
-import { CameraAccess } from "@/components/widgets/camera-access";
 import { CameraAccessState } from "@/types/camera";
 
 const ScanPage: React.FC = () => {
@@ -19,7 +19,10 @@ const ScanPage: React.FC = () => {
         setCamAccessState={setCamAccessState}
       />
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed px-4 shadow-sm">
-        <CameraAccess camAccessState={camAccessState} setCamOn={setCamOn} />
+        <DisplayCameraAccess
+          camAccessState={camAccessState}
+          setCamOn={setCamOn}
+        />
       </div>
     </>
   );
