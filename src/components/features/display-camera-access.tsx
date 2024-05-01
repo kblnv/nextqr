@@ -15,7 +15,7 @@ const DisplayCameraAccess: React.FC<CameraAccessProps> = ({
   return (
     <>
       {camAccessState === "pending" ? (
-        <Loader />
+        <Loader msg="Получаем доступ к камере..." />
       ) : (
         <div className="flex flex-col items-center gap-1">
           {camAccessState === "ok" ? (
