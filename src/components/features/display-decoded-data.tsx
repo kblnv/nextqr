@@ -36,9 +36,7 @@ const DisplayDecodedData: React.FC<DisplayDecodedDataProps> = ({
     <>
       <DialogHeader>
         <DialogTitle>Декодированные данные</DialogTitle>
-        <DialogDescription>
-          Закройте окно для повторного сканирования
-        </DialogDescription>
+        <DialogDescription>Закройте окно чтобы продолжить</DialogDescription>
       </DialogHeader>
       <div className="flex items-center space-x-2">
         <div className="grid flex-1 gap-2">

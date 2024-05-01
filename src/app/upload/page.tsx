@@ -8,14 +8,13 @@ import { DisplayResult } from "@/components/features/display-result";
 import { Input } from "@/components/shared/input";
 import { Label } from "@/components/shared/label";
 import { Loader } from "@/components/shared/loader";
+import { useDecodingResult } from "@/hooks/useDecodingResult";
 import { textIsUrl } from "@/lib/utils";
-import { useDecodingResult } from "../hooks/useDecodingResult";
+import { FileUploadArea } from "@/components/features/file-upload-area";
 
 const UploadPage: React.FC = () => {
   const { decodingResult, setDecodingResult, resetDecodingResult } =
     useDecodingResult(null);
-
-  const [dragging, setDragging] = useState(false);
   const [fileProcessing, setFileProcessing] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -27,7 +26,7 @@ const UploadPage: React.FC = () => {
     }
   }, [resetDecodingResult]);
 
-  const uploadAndProcessFile = async (fileList: FileList | null) => {
+  const processFile = useCallback(async (fileList: FileList | null) => {
     setFileProcessing(true);
     resetDecodingResult();
 
@@ -52,43 +51,17 @@ const UploadPage: React.FC = () => {
     } finally {
       setFileProcessing(false);
     }
-  };
+  }, [resetDecodingResult, setDecodingResult]);
 
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
     event,
   ) => {
     const fileList = event.target.files;
-    uploadAndProcessFile(fileList);
-  };
-
-  const handleDragOn: React.DragEventHandler = (event) => {
-    event.preventDefault();
-    setDragging(true);
-  };
-
-  const handleDragOff: React.DragEventHandler = (event) => {
-    event.preventDefault();
-    setDragging(false);
-  };
-
-  const handleDrop: React.DragEventHandler = (event) => {
-    event.preventDefault();
-    setDragging(false);
-    uploadAndProcessFile(event.dataTransfer.files);
+    processFile(fileList);
   };
 
   return (
-    <div
-      className={
-        dragging
-          ? "flex flex-1 items-center justify-center rounded-lg border border-dashed border-blue-500 px-4 shadow-sm"
-          : "flex flex-1 items-center justify-center rounded-lg border border-dashed px-4 shadow-sm"
-      }
-      onDragOver={handleDragOn}
-      onDragEnter={handleDragOn}
-      onDragLeave={handleDragOff}
-      onDrop={handleDrop}
-    >
+    <FileUploadArea processFile={processFile}>
       <div className="flex flex-col items-center gap-1">
         {fileProcessing ? (
           <Loader />
@@ -120,7 +93,7 @@ const UploadPage: React.FC = () => {
           </>
         )}
       </div>
-    </div>
+    </FileUploadArea>
   );
 };
 
