@@ -1,12 +1,12 @@
+import { useDecodingResult } from "@/app/hooks/useDecodingResult";
 import { DisplayResult } from "@/components/features/display-result";
 import { Button } from "@/components/shared/button";
 import { ScanArea } from "@/components/shared/scan-area";
 import { textIsUrl } from "@/lib/utils";
 import { CameraService } from "@/services/camera-service";
 import { CameraAccessState } from "@/types/camera";
-import { DecodingResult } from "@/types/decoding-result";
 import { X } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 interface CameraProps {
   camOn: boolean;
@@ -19,9 +19,7 @@ const Camera: React.FC<CameraProps> = ({
   setCamOn,
   setCamAccessState,
 }) => {
-  const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
-    null,
-  );
+  const { decodingResult, setDecodingResult, resetDecodingResult } = useDecodingResult(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -64,7 +62,7 @@ const Camera: React.FC<CameraProps> = ({
         },
       });
     }
-  }, [setCamOn]);
+  }, [setCamOn, setDecodingResult]);
 
   useEffect(() => {
     if (camOn) {
@@ -80,8 +78,8 @@ const Camera: React.FC<CameraProps> = ({
   }, [setCamOn]);
 
   const resetResult = useCallback(() => {
-    setDecodingResult(null);
-  }, []);
+    resetDecodingResult();
+  }, [resetDecodingResult]);
 
   return (
     <>

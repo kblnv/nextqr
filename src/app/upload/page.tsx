@@ -2,20 +2,20 @@
 
 import React, { useCallback, useRef, useState } from "react";
 
-import { readBarcodesFromImageFile } from "zxing-wasm";
+import { readBarcodesFromImageFile } from "zxing-wasm/reader";
 
 import { DisplayResult } from "@/components/features/display-result";
 import { Input } from "@/components/shared/input";
 import { Label } from "@/components/shared/label";
 import { Loader } from "@/components/shared/loader";
 import { textIsUrl } from "@/lib/utils";
-import { DecodingResult } from "@/types/decoding-result";
+import { useDecodingResult } from "../hooks/useDecodingResult";
 
 const UploadPage: React.FC = () => {
-  const [decodingResult, setDecodingResult] = useState<DecodingResult | null>(
-    null,
-  );
-  const [dragged, setDragged] = useState(false);
+  const { decodingResult, setDecodingResult, resetDecodingResult } =
+    useDecodingResult(null);
+
+  const [dragging, setDragging] = useState(false);
   const [fileProcessing, setFileProcessing] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -23,13 +23,13 @@ const UploadPage: React.FC = () => {
   const resetResult = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.value = "";
-      setDecodingResult(null);
+      resetDecodingResult();
     }
-  }, []);
+  }, [resetDecodingResult]);
 
   const uploadAndProcessFile = async (fileList: FileList | null) => {
     setFileProcessing(true);
-    setDecodingResult(null);
+    resetDecodingResult();
 
     try {
       if (fileList) {
@@ -63,24 +63,24 @@ const UploadPage: React.FC = () => {
 
   const handleDragOn: React.DragEventHandler = (event) => {
     event.preventDefault();
-    setDragged(true);
+    setDragging(true);
   };
 
   const handleDragOff: React.DragEventHandler = (event) => {
     event.preventDefault();
-    setDragged(false);
+    setDragging(false);
   };
 
   const handleDrop: React.DragEventHandler = (event) => {
     event.preventDefault();
-    setDragged(false);
+    setDragging(false);
     uploadAndProcessFile(event.dataTransfer.files);
   };
 
   return (
     <div
       className={
-        dragged
+        dragging
           ? "flex flex-1 items-center justify-center rounded-lg border border-dashed border-blue-500 px-4 shadow-sm"
           : "flex flex-1 items-center justify-center rounded-lg border border-dashed px-4 shadow-sm"
       }
