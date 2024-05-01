@@ -1,11 +1,11 @@
-import { useDecodingResult } from "@/app/hooks/useDecodingResult";
+import { CameraToolbar } from "@/components/features/camera-toolbar";
 import { DisplayResult } from "@/components/features/display-result";
 import { ScanArea } from "@/components/shared/scan-area";
+import { useDecodingResult } from "@/hooks/useDecodingResult";
 import { textIsUrl } from "@/lib/utils";
 import { CameraService } from "@/services/camera-service";
 import { CameraAccessState } from "@/types/camera";
 import React, { useCallback, useEffect, useRef } from "react";
-import { CameraToolbar } from "../features/camera-toolbar";
 
 interface CameraProps {
   camOn: boolean;

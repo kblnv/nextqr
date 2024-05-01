@@ -5,17 +5,16 @@ import React, { useCallback, useRef, useState } from "react";
 import { readBarcodesFromImageFile } from "zxing-wasm/reader";
 
 import { DisplayResult } from "@/components/features/display-result";
+import { FileUploadArea } from "@/components/features/file-upload-area";
 import { Input } from "@/components/shared/input";
 import { Label } from "@/components/shared/label";
 import { Loader } from "@/components/shared/loader";
+import { useDecodingResult } from "@/hooks/useDecodingResult";
 import { textIsUrl } from "@/lib/utils";
-import { useDecodingResult } from "../hooks/useDecodingResult";
 
 const UploadPage: React.FC = () => {
   const { decodingResult, setDecodingResult, resetDecodingResult } =
     useDecodingResult(null);
-
-  const [dragging, setDragging] = useState(false);
   const [fileProcessing, setFileProcessing] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -27,71 +26,48 @@ const UploadPage: React.FC = () => {
     }
   }, [resetDecodingResult]);
 
-  const uploadAndProcessFile = async (fileList: FileList | null) => {
-    setFileProcessing(true);
-    resetDecodingResult();
+  const processFile = useCallback(
+    async (fileList: FileList | null) => {
+      setFileProcessing(true);
+      resetDecodingResult();
 
-    try {
-      if (fileList) {
-        const [file] = fileList;
-        const [processedFile] = await readBarcodesFromImageFile(file);
+      try {
+        if (fileList) {
+          const [file] = fileList;
+          const [processedFile] = await readBarcodesFromImageFile(file);
 
+          setDecodingResult({
+            data: {
+              text: processedFile.text,
+              isURL: textIsUrl(processedFile.text),
+            },
+          });
+        }
+      } catch (err) {
         setDecodingResult({
-          data: {
-            text: processedFile.text,
-            isURL: textIsUrl(processedFile.text),
+          error: {
+            msg: "Произошла ошибка в ходе считывания файла: неправильный тип файла или QR-код не распознан",
           },
         });
+      } finally {
+        setFileProcessing(false);
       }
-    } catch (err) {
-      setDecodingResult({
-        error: {
-          msg: "Произошла ошибка в ходе считывания файла: неправильный тип файла или QR-код не распознан",
-        },
-      });
-    } finally {
-      setFileProcessing(false);
-    }
-  };
+    },
+    [resetDecodingResult, setDecodingResult],
+  );
 
   const handleFileUpload: React.ChangeEventHandler<HTMLInputElement> = async (
     event,
   ) => {
     const fileList = event.target.files;
-    uploadAndProcessFile(fileList);
-  };
-
-  const handleDragOn: React.DragEventHandler = (event) => {
-    event.preventDefault();
-    setDragging(true);
-  };
-
-  const handleDragOff: React.DragEventHandler = (event) => {
-    event.preventDefault();
-    setDragging(false);
-  };
-
-  const handleDrop: React.DragEventHandler = (event) => {
-    event.preventDefault();
-    setDragging(false);
-    uploadAndProcessFile(event.dataTransfer.files);
+    processFile(fileList);
   };
 
   return (
-    <div
-      className={
-        dragging
-          ? "flex flex-1 items-center justify-center rounded-lg border border-dashed border-blue-500 px-4 shadow-sm"
-          : "flex flex-1 items-center justify-center rounded-lg border border-dashed px-4 shadow-sm"
-      }
-      onDragOver={handleDragOn}
-      onDragEnter={handleDragOn}
-      onDragLeave={handleDragOff}
-      onDrop={handleDrop}
-    >
+    <FileUploadArea processFile={processFile}>
       <div className="flex flex-col items-center gap-1">
         {fileProcessing ? (
-          <Loader />
+          <Loader msg="Обрабатываем файл..." />
         ) : (
           <>
             <h3 className="text-center text-lg font-bold tracking-tight sm:text-2xl">
@@ -120,7 +96,7 @@ const UploadPage: React.FC = () => {
           </>
         )}
       </div>
-    </div>
+    </FileUploadArea>
   );
 };
 
