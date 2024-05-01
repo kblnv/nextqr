@@ -1,6 +1,3 @@
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-import React from "react";
 import { Button } from "@/components/shared/button";
 import {
   DropdownMenu,
@@ -8,6 +5,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/shared/dropdown-menu";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import React from "react";
 
 const ThemeToggle: React.FC = () => {
   const { setTheme } = useTheme();

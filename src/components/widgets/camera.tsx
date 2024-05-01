@@ -1,12 +1,11 @@
 import { useDecodingResult } from "@/app/hooks/useDecodingResult";
 import { DisplayResult } from "@/components/features/display-result";
-import { Button } from "@/components/shared/button";
 import { ScanArea } from "@/components/shared/scan-area";
 import { textIsUrl } from "@/lib/utils";
 import { CameraService } from "@/services/camera-service";
 import { CameraAccessState } from "@/types/camera";
-import { X } from "lucide-react";
 import React, { useCallback, useEffect, useRef } from "react";
+import { CameraToolbar } from "../features/camera-toolbar";
 
 interface CameraProps {
   camOn: boolean;
@@ -19,7 +18,8 @@ const Camera: React.FC<CameraProps> = ({
   setCamOn,
   setCamAccessState,
 }) => {
-  const { decodingResult, setDecodingResult, resetDecodingResult } = useDecodingResult(null);
+  const { decodingResult, setDecodingResult, resetDecodingResult } =
+    useDecodingResult(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -92,14 +92,7 @@ const Camera: React.FC<CameraProps> = ({
           playsInline
           className="h-full w-full object-cover"
         />
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute left-0 top-0 h-8 w-8 translate-x-5 translate-y-5"
-          onClick={turnOffCamera}
-        >
-          <X />
-        </Button>
+        <CameraToolbar turnOffCamera={turnOffCamera} />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <ScanArea />
         </div>

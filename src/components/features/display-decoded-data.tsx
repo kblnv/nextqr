@@ -1,5 +1,3 @@
-import React, { useRef } from "react";
-import { Copy } from "lucide-react";
 import { Button } from "@/components/shared/button";
 import {
   DialogClose,
@@ -11,6 +9,8 @@ import {
 import { Input } from "@/components/shared/input";
 import { Label } from "@/components/shared/label";
 import { DecodedData } from "@/types/decoding-result";
+import { Copy } from "lucide-react";
+import React, { useRef } from "react";
 
 interface DisplayDecodedDataProps {
   decodedData: DecodedData["data"];
