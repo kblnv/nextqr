@@ -70,9 +70,9 @@ const UploadPage: React.FC = () => {
           <Loader msg="Обрабатываем файл..." />
         ) : (
           <>
-            <h3 className="text-center text-lg font-bold tracking-tight sm:text-2xl">
+            <h1 className="text-center text-lg font-bold tracking-tight sm:text-2xl">
               Загрузите файл с QR-кодом
-            </h3>
+            </h1>
             <p className="text-center text-sm text-muted-foreground">
               Выберите файл или перетащите его в эту область
             </p>
